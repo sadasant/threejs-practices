@@ -1,0 +1,4 @@
+Third three.js practice.
+Many thanks to <a href="http://classic-web.archive.org/web/20070610223835/http://www.teknikus.dk/tj/gdc2001.htm">this paper</a>, and <a href="http://andrew-hoyer.com/experiments/particle_system/">this dude</a>.
+Middle-click to throw another particle.
+

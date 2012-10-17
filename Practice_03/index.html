@@ -1,0 +1,114 @@
+<!DOCTYPE HTML>
+<html lang="en">
+  <head>
+    <title>three.js practice 01 &lt;www.sadasant.com></title>
+    <meta charset="utf-8">
+    <style type="text/css">
+      body {
+        color: #808080;
+        font-family:Monospace;
+        font-size:13px;
+        text-align:center;
+
+        background-color: #000000;
+        background-position: top center;
+        margin: 0px;
+        overflow: hidden;
+      }
+      #info {
+        position: absolute;
+        top: 0px; width: 100%;
+        padding: 5px;
+      }
+      a { color: #0080ff; }
+    </style>
+  </head>
+  <body>
+    <div id="container"></div> 
+    <div id="info">
+	 Third <a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a>
+	 practice. <a href="http://sadasant.com/">(^-^)</a></br>
+	 Many thanks to <a href="http://classic-web.archive.org/web/20070610223835/http://www.teknikus.dk/tj/gdc2001.htm">this paper</a>, and <a href="http://andrew-hoyer.com/experiments/particle_system/">this dude</a>.</br>
+         Click to move. Middle-click to throw another particle. :D
+    </div>
+	
+    <script type="text/javascript" src="../js/Three.js"></script>
+    <script type="text/javascript" src="../js/Stats.js"></script>
+    <script type="text/javascript" src="js/System.js"></script>
+    <script type="text/javascript" src="js/utils.js"></script>
+    <script type="text/javascript">
+      var container, stats, camera, scene, scene2, renderer, planets = [],
+          o, o2, windowHalfX = window.innerWidth / 2,
+          windowHalfY = window.innerHeight / 2;
+      var worldWidth = 200,
+          worldDepth = 200,
+          worldHalfWidth = worldWidth / 2,
+          worldHalfDepth = worldDepth / 2;
+      Sys = new System();
+      Sys.name = "Sys";
+      //            stats = new Stats();
+      //            stats.domElement.style.position = 'absolute';
+      //            stats.domElement.style.top = '0px';
+      //            Sys.container.appendChild( stats.domElement );
+      TIME = 1000 / 30;
+      Sys.time = TIME;
+      Sys.addStar({
+        position: {
+          x: 0,
+          y: 0,
+          z: 0
+        },
+        v0: new THREE.Vector3(),
+        diameter: 10
+      });
+      Sys.addPlanet({
+        position: {
+          x: 0,
+          y: 0,
+          z: -100
+        },
+        v0: new THREE.Vector3(-4.5, 0, -100),
+        diameter: 2
+      });
+      Sys.addPlanet({
+        position: {
+          x: 0,
+          y: 0,
+          z: +100
+        },
+        v0: new THREE.Vector3(+4.5, 0, +100),
+        diameter: 2
+      }), Sys.addGlitter({
+        number: 100,
+        far: 1
+      }), Sys.addGlitter({
+        number: 100,
+        far: 2
+      })
+      stats = new Stats();
+      stats.domElement.style.position = 'absolute';
+      stats.domElement.style.top = '0px';
+      Sys.container.appendChild(stats.domElement);
+      Sys.on_animate = function() {
+        Sys.gravitate();
+        stats.update();
+      };
+      document.addEventListener('click', onClick, false);
+      Sys.Animate();
+      
+      function onClick(e) {
+        if (e.which == 2) {
+          var pos = Sys.camera.position.clone(),
+              v0 = Sys.camera.target.position.clone();
+          v0.multiplySelf(new THREE.Vector3(0.02,0.02,-0.2))
+          console.debug(v0,Sys.camera,v0);
+          Sys.addPlanet({
+            position: pos,
+            v0: pos.clone().addSelf(v0),
+            diameter: 2
+          });
+        }
+      }
+    </script>
+  </body>
+</html>

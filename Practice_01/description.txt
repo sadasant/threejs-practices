@@ -1,0 +1,3 @@
+My first three.js practice.
+click-and-drag to rotate the sphere.
+Refresh to change the colors.

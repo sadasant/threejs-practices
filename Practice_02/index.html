@@ -1,0 +1,201 @@
+<!DOCTYPE HTML>
+<html lang="en">
+    <head>
+        <title>three.js practice 01 &lt;www.sadasant.com></title>
+        <meta charset="utf-8">
+        <style type="text/css">
+            body {
+                color: #808080;
+                font-family:Monospace;
+                font-size:13px;
+                text-align:center;
+
+                background-color: #000000;
+/*                background-image: url('img/space.jpg'); */
+                background-position: top center;
+                margin: 0px;
+                overflow: hidden;
+                }
+
+            #info {
+                position: absolute;
+                top: 0px; width: 100%;
+                padding: 5px;
+                }
+
+            a { color: #0080ff; }
+
+        </style>
+    </head>
+    <body>
+
+        <div id="container"></div> 
+        <div id="info">
+            <a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> -
+            three.js practice. <a href="http://sadasant.com/">(^-^)</a></br>
+
+        </div>
+
+        <script type="text/javascript" src="../js/Three.js"></script>
+
+        <script type="text/javascript" src="../js/RequestAnimationFrame.js"></script>
+        <script type="text/javascript" src="../js/Stats.js"></script>
+
+        <script type="text/javascript">
+
+            var container, stats,
+                camera, scene, scene2, renderer,
+
+                sun, planet, planet2,
+
+                isMoving = false,
+                move = {t:{x: 0, y: 0, z: 0}, x: 0, y: 0, z: 0},
+
+                windowHalfX = window.innerWidth / 2,
+                windowHalfY = window.innerHeight / 2;
+
+                var worldWidth = 200, worldDepth = 200,
+                worldHalfWidth = worldWidth / 2, worldHalfDepth = worldDepth / 2;
+
+            init();
+            animate();
+
+            function init(){
+
+                container = document.getElementById( 'container' );
+
+                camera = new THREE.QuakeCamera({
+                    fov: 50, aspect: window.innerWidth / window.innerHeight, near: 1, far: 2000,
+                    constrainVertical: true, verticalMin: 1.1, verticalMax: 3.3,
+                    movementSpeed: 50, lookSpeed: 0.05, noFly: false, lookVertical: true, autoForward: false
+                    });
+
+                camera.position.x = -400;
+                camera.position.y = 300;
+                camera.position.z = 0;
+                
+                scene = new THREE.Scene();
+                scene2 = new THREE.Scene();
+
+                // sun
+                sun = new THREE.Mesh( new THREE.Sphere( 30, 16, 8 ),
+                                      new THREE.MeshBasicMaterial({
+                                          map: THREE.ImageUtils.loadTexture('img/sun.png')
+                                          // color: 0x000000,
+                                          }));                sun.overdraw = true;
+                sun.doubleSided = false;
+                scene2.addObject(sun);
+
+                // atmosphere
+                atmosphere = new THREE.Particle(
+                             new THREE.ParticleBasicMaterial({
+                                 map: THREE.ImageUtils.loadTexture('img/atmosphere.png' ),
+                                 blending: THREE.AdditiveBlending
+                                 }));
+                atmosphere.scale.x = atmosphere.scale.y = 0.11;
+                scene2.addObject( atmosphere );
+
+                // blackearth
+                blackearth = new THREE.Particle(
+                             new THREE.ParticleBasicMaterial({
+                                 map: THREE.ImageUtils.loadTexture('img/black-earth.png' ),
+                                 }));
+                blackearth.scale.x = blackearth.scale.y = 0.105;
+                scene2.addObject( blackearth );
+
+                // sunshine
+                sunshine = new THREE.Particle(
+                           new THREE.ParticleBasicMaterial({
+                               map: THREE.ImageUtils.loadTexture('img/sunshine.png' ),
+                               blending: THREE.AdditiveBlending
+                               }));
+                sunshine.scale.x = sunshine.scale.y = 1.4;
+                scene.addObject( sunshine );
+
+                // planet
+                planet = new THREE.Mesh(
+                         new THREE.Sphere( 10, 16, 8 ),
+                         new THREE.MeshLambertMaterial({
+                             map: THREE.ImageUtils.loadTexture('img/earth.png'),
+                             blending: THREE.AdditiveBlending,
+                             shading: THREE.SmoothShading
+                             }));
+                planet.overdraw = true;
+                planet.doubleSided = false;
+                scene2.addObject(planet);
+
+                var PI2 = Math.PI * 2;
+                var program = function ( context ){
+
+                    context.beginPath();
+                    context.arc( 0, 0, 1, 0, PI2, true );
+                    context.closePath();
+                    context.fill();
+                    }
+
+                scene2.addLight( new THREE.AmbientLight( 0x000000 ) );
+
+                var directionalLight = new THREE.DirectionalLight( 0xffffff );
+                directionalLight.position.x = 0.0;
+                directionalLight.position.y = 0.0;
+                directionalLight.position.z = 0.0;
+                directionalLight.position.normalize();
+                scene2.addLight( directionalLight );
+
+                sunLight = new THREE.PointLight( 0x80EEFF, 1 );
+                scene2.addLight( sunLight );
+
+                renderer = new THREE.CanvasRenderer();
+                renderer.autoClear = false;
+                renderer.setSize( window.innerWidth, window.innerHeight );
+
+                container.appendChild( renderer.domElement );
+
+                stats = new Stats();
+                stats.domElement.style.position = 'absolute';
+                stats.domElement.style.top = '0px';
+                container.appendChild( stats.domElement );
+
+                }
+
+            //
+
+            function animate(){
+
+                requestAnimationFrame( animate );
+
+                render();
+                stats.update();
+
+                }
+
+            function render(){
+            
+                renderer.clear();
+
+                renderer.render( scene, camera );
+                renderer.render( scene2, camera );
+
+                var timer = new Date().getTime() * 0.000001;
+                planet.position.x = Math.sin( timer * 10 ) * 380;
+                planet.position.y = Math.cos( timer *  5 ) *  10;
+                planet.position.z = Math.cos( timer * 10 ) * 420;
+                atmosphere.position.x = planet.position.x;
+                atmosphere.position.y = planet.position.y;
+                atmosphere.position.z = planet.position.z;
+                blackearth.position.x = planet.position.x;
+                blackearth.position.y = planet.position.y;
+                blackearth.position.z = planet.position.z;
+
+                sun.rotation.y = timer * 10;
+                sun.rotation.x = Math.cos( timer * 1 ) * 0.1;
+                planet.rotation.y = timer * 100;
+                planet.rotation.x = Math.cos( timer * 1 ) * 0.1;
+
+                }
+
+
+        </script>
+
+    </body>
+</html>

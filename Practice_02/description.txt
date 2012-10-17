@@ -1,0 +1,3 @@
+Second three.js practice.
+Find the earth, fly to it.
+(under development)
